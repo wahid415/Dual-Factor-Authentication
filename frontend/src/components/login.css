@@ -1,0 +1,11 @@
+.login-page {
+  width: 300px;
+  height: 300px;
+  margin: auto;
+  background-color: aqua;
+}
+
+.input-field:input {
+  margin: auto;
+  padding: 40px;
+}
