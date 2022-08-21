@@ -23,6 +23,7 @@
     "express-async-error": "^0.0.2",
     "express-session": "^1.17.3",
     "joi": "^17.6.0",
+    "lodash": "^4.17.21",
     "mongoose": "^6.5.0",
     "winston": "^3.8.1"
   },

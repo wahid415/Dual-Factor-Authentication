@@ -1,8 +1,12 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const _ = require("lodash");
 
-const sendEmail = require("../utils/email");
+const {
+  sendDfaVerificationEmail,
+  sendWelcomeEmail,
+} = require("../utils/email");
 const { authUser } = require("../middleware/auth");
 const {
   userLoginInputValidate,
@@ -52,11 +56,17 @@ router.post("/register", async (req, res) => {
         user.verificationToken = token;
         user.verificationTokenExpiration = Date(Date.now + 3600000);
         await user.save();
+
+        //Send Email for verification
+        await sendWelcomeEmail(
+          email,
+          username,
+          token,
+          "Thanks for joining in!"
+        );
+
+        res.send("User Registered Successfully!");
       });
-
-      await sendEmail(email, username, token, "Thanks for joining in!");
-
-      res.send("User Registered Successfully!");
     } else {
       res
         .status(400)
@@ -67,7 +77,7 @@ router.post("/register", async (req, res) => {
   }
 });
 0;
-router.post("/login", async (req, res) => {
+router.post("/login", authUser, async (req, res) => {
   const { email, password } = req.body;
 
   //Sanitize and validate user inputs
@@ -99,11 +109,13 @@ router.post("/login", async (req, res) => {
   });
 
   const tokenSavedDoc = await dfaToken.save();
-  //await sendEmail(email, dfaToken); // send OTP in mail and generate OTP
+
+  // send OTP in mail and generate OTP
+  await sendDfaVerificationEmail(email, otpToken);
 
   res.status(200).json({
     message: "Email sent for DFA",
-    userId: tokenSavedDoc.userId,
+    user: _.pick(user, ["_id", "username", "email"]),
     otpTokenId: tokenSavedDoc._id,
   });
 });
@@ -138,8 +150,31 @@ router.post("/login/validate_2fa", authUser, async (req, res) => {
   return res.status(200).send({ message: "DFA verified!" });
 });
 
-router.get("/feed", authUser, (req, res) => {
-  res.send("session verified");
+//Edit Profile Route
+router.post("/edit-profile", authUser, async (req, res) => {
+  const { username, userId } = req.body;
+
+  const user = await User.findOne({ userId });
+
+  if (!user) {
+    return res.status(401).send("Please login again, unauthorized user.");
+  }
+
+  let updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { username },
+    { new: true }
+  );
+
+  updatedUser = _.pick(user, ["_id", "username", "email"]);
+  updatedUser.username = username;
+
+  console.log(updatedUser);
+
+  res.json({
+    message: "User Profile updated.",
+    updatedProfile: updatedUser,
+  });
 });
 
 module.exports = router;

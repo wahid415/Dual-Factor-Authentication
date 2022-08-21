@@ -11,6 +11,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import Two2fa from "./components/Two2fa";
+import UserProfile from "./components/UserProfile";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/validate_2fa" element={<Two2fa />} />
+            <Route path="/user-profile" element={<UserProfile />} />
           </Routes>
         </div>
       </Provider>

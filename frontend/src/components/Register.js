@@ -34,23 +34,14 @@ const Register = () => {
       );
       navigate("/");
     } catch (error) {
-      setError(
-        error.response.message ? error.response.message : error.response
-      );
+      setError(error.response.data ? error.response.data : error.response);
       console.log("Error: ", error.response);
     }
   };
 
-  if (error) {
-    return (
-      <>
-        <h2>Error: Something is wrong!</h2>
-      </>
-    );
-  }
-
   return (
     <>
+      {error && <h3 className="text-danger">{error.message}</h3>}
       <div className="register-page">
         <h1>User Registration</h1>
         <form className="register-form" onSubmit={submitHandler}>

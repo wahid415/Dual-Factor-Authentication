@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { userLoginAction } from "../store/actions/userActions";
 
-import "./login.css";
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,13 +11,14 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { data, error, status } = useSelector((state) => state.userLogin);
-
-  console.log("USER LOGIN COMPONENT : , ", data);
+  const { loggedInUser, isDfaVerified, userInfo, error, status } = useSelector(
+    (state) => state.userLogin
+  );
 
   useEffect(() => {
-    if (data) return navigate("/validate_2fa");
-  }, [data, navigate]);
+    if (loggedInUser && isDfaVerified) return navigate("/dashboard");
+    if (userInfo || loggedInUser) return navigate("/validate_2fa");
+  }, [userInfo, loggedInUser, isDfaVerified, navigate]);
 
   const submitHandler = async (e) => {
     e.preventDefault();

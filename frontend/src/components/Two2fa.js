@@ -1,35 +1,62 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import { userDfaVerifyAction } from "../store/actions/userActions";
 
 const Two2fa = () => {
   const [otp, setOtp] = useState("");
 
   const navigate = useNavigate();
-  const { data, error } = useSelector((state) => state.userLogin);
+  const dispatch = useDispatch();
 
-  console.log(data);
-  console.log(error);
+  const { userInfo, loggedInUser, error, isDfaVerified } = useSelector(
+    (state) => state.userLogin
+  );
 
   useEffect(() => {
-    if (!data) return navigate("/");
-  }, [navigate, data]);
+    if (!loggedInUser && !userInfo) return navigate("/");
+    if (loggedInUser && isDfaVerified) return navigate("/dashboard");
+  }, [navigate, loggedInUser, userInfo, isDfaVerified]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!otp) {
+      return alert("Please enter Otp to login!");
+    }
+
+    dispatch(
+      userDfaVerifyAction({
+        userId: userInfo.user._id,
+        dfaValue: otp,
+        otpTokenId: userInfo.otpTokenId,
+      })
+    );
+  };
 
   return (
-    <div>
-      <h2>Validate Two factor Authentication</h2>
-      <form className="form-group">
-        <div className="form-control">
-          <input
-            type="text"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            placeholder="Enter the OTP sent in mail"
-          />
-        </div>
-      </form>
-    </div>
+    <>
+      <div className="w-50 m-auto">
+        {error && <h3 className="text-danger">{error.message}</h3>}
+        <h2>Validate 2F Authentication</h2>
+        <form className="form-group" onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <input
+              type="text"
+              className="form-control"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter the OTP sent in mail"
+            />
+          </div>
+          <button type="submit" className="btn btn-primary form-control">
+            Verify
+          </button>
+        </form>
+      </div>
+    </>
   );
 };
 

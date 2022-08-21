@@ -8,6 +8,8 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 
 const userRoutes = require("./routes/userRoutes");
+const verifyRoutes = require("./routes/verifyRoutes");
+
 const dbConnect = require("./utils/db");
 const error = require("./middleware/error");
 
@@ -54,6 +56,7 @@ app.use((req, res, next) => {
 
 //Routes setup
 app.use("/api/users", userRoutes);
+app.use("/technical-test", verifyRoutes);
 
 //Error MW for loggin errors
 app.use(error);

@@ -9,13 +9,18 @@ export const STATUSES = Object.freeze({
 const loginSlice = createSlice({
   name: "login",
   initialState: {
-    data: null,
+    loggedInUser: localStorage.getItem("loggedInUser")
+      ? JSON.parse(localStorage.getItem("loggedInUser"))
+      : null,
+    userInfo: null,
+    isDfaVerified: false,
     error: null,
     status: "",
   },
   reducers: {
     userLogin(state, action) {
-      state.data = action.payload;
+      state.userInfo = action.payload;
+      state.loggedInUser = action.payload.user;
       state.error = null;
     },
 
@@ -26,9 +31,14 @@ const loginSlice = createSlice({
     setLoginError(state, action) {
       state.error = action.payload;
     },
+
+    userVerifyDfa(state, action) {
+      state.isDfaVerified = action.payload;
+    },
   },
 });
 
-export const { userLogin, setStatus, setLoginError } = loginSlice.actions;
+export const { userLogin, setStatus, setLoginError, userVerifyDfa } =
+  loginSlice.actions;
 
 export default loginSlice.reducer;
